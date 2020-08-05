@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">GameAuth Example</string>
+    <string name="auth_server_client_id"></string>
 </resources>

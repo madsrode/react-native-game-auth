@@ -1,15 +1,29 @@
 import * as React from 'react';
 import { StyleSheet, View, Text, Button } from 'react-native';
-import GameAuth from 'react-native-game-auth';
+import { GameCenterAuth, PlayGamesAuth } from 'react-native-game-auth';
 
 export default function App() {
   const [result, setResult] = React.useState<Boolean | undefined>();
   const [json, setJson] = React.useState<string | undefined>();
 
+  const psAuthStateChanged = (isSignedIn: boolean): void => {
+    console.log('psAuth', isSignedIn);
+  };
+  const psAuthTokenChanged = (s: string) => {
+    console.log('psAuthToken', s);
+  };
+
   React.useEffect(() => {
-    GameAuth.authenticateUser()
-      .then((x) => setResult(x))
-      .catch((e) => console.log('e', JSON.stringify(e)));
+    if (PlayGamesAuth) {
+      PlayGamesAuth.onAuthStateChanged(psAuthStateChanged);
+      PlayGamesAuth.onAuthTokenChanged(psAuthTokenChanged);
+    }
+
+    if (GameCenterAuth) {
+      GameCenterAuth.authenticateUser()
+        .then((x) => setResult(x))
+        .catch((e) => console.log('e', JSON.stringify(e)));
+    }
   }, []);
 
   return (
@@ -18,7 +32,7 @@ export default function App() {
       <Button
         title="getPlayer"
         onPress={() => {
-          GameAuth.getPlayer()
+          GameCenterAuth?.getPlayer()
             .then((x) => setJson(JSON.stringify(x)))
             .catch((x) => console.warn(x));
         }}
@@ -26,9 +40,17 @@ export default function App() {
       <Button
         title="getServerAuth"
         onPress={() => {
-          GameAuth.getServerAuth()
+          GameCenterAuth?.getServerAuth()
             .then((x) => setJson(JSON.stringify(x)))
             .catch((x) => console.warn(x));
+        }}
+      />
+      <Button
+        title="getServerAuth"
+        onPress={() => {
+          PlayGamesAuth?.signInSilent(true)
+            .then((x: any) => setJson(JSON.stringify(x)))
+            .catch((x: any) => console.warn(x));
         }}
       />
       <Text>JSON: {json}</Text>

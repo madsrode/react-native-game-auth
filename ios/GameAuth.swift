@@ -70,4 +70,8 @@ class GameAuth: NSObject {
             reject("Unauthenticated", "", nil);
         }
     }
+
+    static func requiresMainQueueSetup() -> Bool {
+        return true
+    }
 }
