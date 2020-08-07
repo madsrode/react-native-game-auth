@@ -20,14 +20,14 @@ export default function App() {
     }
 
     if (GameCenterAuth) {
-      const x = GameCenterAuth.onAuthenticate((i) => {
-        setResult(i);
-      });
-      GameCenterAuth.initAuth();
+      // const x = GameCenterAuth.onAuthenticate((i) => {
+      //   setResult(i);
+      // });
+      // GameCenterAuth.initAuth();
 
-      return () => {
-        x.remove();
-      };
+      // return () => {
+      //   x.remove();
+      // };
     }
 
     return () => {};
@@ -39,6 +39,7 @@ export default function App() {
       <Button
         title="getPlayer"
         onPress={() => {
+          GameCenterAuth?.isAuthenticated().then(x => console.log('isAuthen', x))
           GameCenterAuth?.getPlayer()
             .then((x) => setJson(JSON.stringify(x)))
             .catch((x) => console.warn(x));

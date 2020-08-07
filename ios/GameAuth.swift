@@ -23,7 +23,7 @@ class GameAuth: RCTEventEmitter {
         }      
     }
 
-    @objc(isAutheticated:rejecter:)
+    @objc(isAuthenticated:rejecter:)
     func isAuthenticated(_ resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock ) -> Void {
         let player = GKLocalPlayer.local
         resolve(player.isAuthenticated)
