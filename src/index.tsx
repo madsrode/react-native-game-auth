@@ -1,4 +1,9 @@
-import { NativeModules, DeviceEventEmitter } from 'react-native';
+import {
+  NativeModules,
+  DeviceEventEmitter,
+  NativeEventEmitter,
+  EmitterSubscription,
+} from 'react-native';
 
 interface Player {
   alias: String;
@@ -13,13 +18,6 @@ export interface IdentityVerificationSignature {
   timestamp: Number;
 }
 
-type GameCenterAuthType = {
-  authenticateUser(): Promise<Boolean>;
-  isAuthenticated(): Promise<Boolean>;
-  getPlayer(): Promise<Player>;
-  getServerAuth(): Promise<IdentityVerificationSignature>;
-};
-
 type PlayGamesAuthType = {
   signIn(): Promise<boolean>;
   signInSilent(triggerUISignInIfSilentFails: boolean): Promise<boolean>;
@@ -30,7 +28,6 @@ type PlayGamesAuthType = {
   AUTH_TOKEN_CHANGED_EVENT: string;
 };
 
-const GameCenterAuth: GameCenterAuthType | undefined = NativeModules.GameAuth;
 const PlayGamesAuth: PlayGamesAuthType | undefined =
   NativeModules.PlayGamesAuth;
 
@@ -53,5 +50,28 @@ if (PlayGamesAuth) {
     );
   };
 }
+
+if (NativeModules.GameAuth) {
+  NativeModules.GameAuth.onAuthenticate = (
+    callback: (isAuthenticated: boolean) => void
+  ): EmitterSubscription => {
+    const e = new NativeEventEmitter(NativeModules.GameAuth);
+    return e.addListener('OnAuthenticate', (data: any) => {
+      callback(data.isAuthenticated);
+    });
+  };
+}
+
+type GameCenterAuthType = {
+  initAuth(): void;
+  isAuthenticated(): Promise<Boolean>;
+  getPlayer(): Promise<Player>;
+  getServerAuth(): Promise<IdentityVerificationSignature>;
+  onAuthenticate(
+    callback: (isAuthenticated: boolean) => void
+  ): EmitterSubscription;
+};
+
+const GameCenterAuth: GameCenterAuthType | undefined = NativeModules.GameAuth;
 
 export { GameCenterAuth, PlayGamesAuth };

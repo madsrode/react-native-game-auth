@@ -20,10 +20,17 @@ export default function App() {
     }
 
     if (GameCenterAuth) {
-      GameCenterAuth.authenticateUser()
-        .then((x) => setResult(x))
-        .catch((e) => console.log('e', JSON.stringify(e)));
+      const x = GameCenterAuth.onAuthenticate((i) => {
+        setResult(i);
+      });
+      GameCenterAuth.initAuth();
+
+      return () => {
+        x.remove();
+      };
     }
+
+    return () => {};
   }, []);
 
   return (

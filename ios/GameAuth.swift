@@ -1,9 +1,15 @@
 import GameKit
 
 @objc(GameAuth)
-class GameAuth: NSObject {
-    @objc(authenticateUser:rejecter:)
-    func authenticateUser(_ resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock ) -> Void {
+class GameAuth: RCTEventEmitter {
+  let C_OnAuthenticated: String = "OnAuthenticate";
+
+  open override func supportedEvents() -> [String] {
+    return [self.C_OnAuthenticated];
+  }
+
+    @objc
+    func initAuth() {
         let ui = UIApplication.shared.keyWindow?.rootViewController;
 
         let player = GKLocalPlayer.local
@@ -12,13 +18,9 @@ class GameAuth: NSObject {
                 ui?.present(vc!, animated: true, completion: nil);
             }
             else {
-                if(error == nil) {
-                    resolve(player.isAuthenticated)
-                } else {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
-                    reject(error?.localizedDescription ?? "", "", error)
-                }
+                self.sendEvent(withName: self.C_OnAuthenticated, body: ["isAuthenticated":player.isAuthenticated, "error": error])
             }
-        }       
+        }      
     }
 
     @objc(isAutheticated:rejecter:)
@@ -71,7 +73,7 @@ class GameAuth: NSObject {
         }
     }
 
-    static func requiresMainQueueSetup() -> Bool {
-        return true
-    }
+    @objc static override func requiresMainQueueSetup() -> Bool {
+        return true 
+    } 
 }
