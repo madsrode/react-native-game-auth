@@ -2,33 +2,52 @@ import GameKit
 
 @objc(GameAuth)
 class GameAuth: RCTEventEmitter {
-  let C_OnAuthenticated: String = "OnAuthenticate";
-
-  open override func supportedEvents() -> [String] {
-    return [self.C_OnAuthenticated];
-  }
-
+    let C_OnAuthenticated: String = "OnAuthenticate";
+    var loginUI: UIViewController? = nil;
+    
+    open override func supportedEvents() -> [String] {
+        return [self.C_OnAuthenticated];
+    }
+    
     @objc
-    func initAuth() {
+    func initAuth(_ showUIIfUnauthenticated: Bool) {
         let ui = UIApplication.shared.keyWindow?.rootViewController;
-
+        
         let player = GKLocalPlayer.local
-        player.authenticateHandler = { vc, error in
-            if(vc != nil) {
-                ui?.present(vc!, animated: true, completion: nil);
+        if(player.authenticateHandler == nil) {
+            player.authenticateHandler = { vc, error in
+                self.loginUI = vc;
+                if(vc != nil) {
+                    if(showUIIfUnauthenticated) {
+                        ui?.present(vc!, animated: true, completion: nil);
+                    }
+                    else {
+                        self.sendEvent(withName: self.C_OnAuthenticated, body: ["isAuthenticated":false, "error": error])
+                    }
+                }
+                else {
+                    self.sendEvent(withName: self.C_OnAuthenticated, body: ["isAuthenticated":player.isAuthenticated, "error": error])
+                }
+            }
+        }
+        else {
+            if(player.isAuthenticated) {
+                self.sendEvent(withName: self.C_OnAuthenticated, body: ["isAuthenticated":player.isAuthenticated, "error": nil])
             }
             else {
-                self.sendEvent(withName: self.C_OnAuthenticated, body: ["isAuthenticated":player.isAuthenticated, "error": error])
+                if(showUIIfUnauthenticated && self.loginUI != nil) {
+                    ui?.present(self.loginUI!, animated: true, completion: nil);
+                }
             }
-        }      
+        }
     }
-
+    
     @objc(isAuthenticated:rejecter:)
     func isAuthenticated(_ resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock ) -> Void {
         let player = GKLocalPlayer.local
         resolve(player.isAuthenticated)
     }
-
+    
     @objc(getPlayer:rejecter:)
     func getPlayer(_ resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock ) -> Void {
         let player = GKLocalPlayer.local
@@ -44,7 +63,7 @@ class GameAuth: RCTEventEmitter {
             reject("Unautheticated", "Unautheticated", nil)
         }
     }
-
+    
     @objc(getServerAuth:rejecter:)
     func getServerAuth(_ resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock ) -> Void {
         let player = GKLocalPlayer.local
@@ -63,7 +82,7 @@ class GameAuth: RCTEventEmitter {
                         "salt" : salt?.base64EncodedString() ?? "",
                         "timestamp": timestamp
                     ]
-
+                    
                     resolve(data);
                 }
             }
@@ -72,7 +91,7 @@ class GameAuth: RCTEventEmitter {
             reject("Unauthenticated", "", nil);
         }
     }
-
+    
     @objc static override func requiresMainQueueSetup() -> Bool {
         return true 
     } 

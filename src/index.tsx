@@ -63,7 +63,7 @@ if (NativeModules.GameAuth) {
 }
 
 type GameCenterAuthType = {
-  initAuth(): void;
+  initAuth(showUIIfUnauthenticated: boolean): void;
   isAuthenticated(): Promise<Boolean>;
   getPlayer(): Promise<Player>;
   getServerAuth(): Promise<IdentityVerificationSignature>;

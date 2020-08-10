@@ -3,7 +3,7 @@ import { StyleSheet, View, Text, Button } from 'react-native';
 import { GameCenterAuth, PlayGamesAuth } from 'react-native-game-auth';
 
 export default function App() {
-  const [result, setResult] = React.useState<Boolean | undefined>();
+  const [result, setResult] = React.useState<Boolean | undefined>(undefined);
   const [json, setJson] = React.useState<string | undefined>();
 
   const psAuthStateChanged = (isSignedIn: boolean): void => {
@@ -23,7 +23,7 @@ export default function App() {
       const x = GameCenterAuth.onAuthenticate((i) => {
         setResult(i);
       });
-      GameCenterAuth.initAuth();
+      GameCenterAuth.initAuth(false);
       return () => {
         x.remove();
       };
@@ -34,16 +34,18 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Text>{result ? 'Authenticated' : 'Not authenticated'}</Text>
+      <Text>{result ? 'Authenticated' : 'Not authenticated ' + result}</Text>
       <Button
         title="getPlayer"
         onPress={() => {
           GameCenterAuth?.isAuthenticated().then((x) =>
             console.log('isAuthen', x)
           );
-          GameCenterAuth?.getPlayer()
-            .then((x) => setJson(JSON.stringify(x)))
-            .catch((x) => console.warn(x));
+          GameCenterAuth?.initAuth(true);
+          GameCenterAuth?.isAuthenticated();
+          // GameCenterAuth?.getPlayer()
+          //   .then((x) => setJson(JSON.stringify(x)))
+          //   .catch((x) => console.warn(x));
         }}
       />
       <Button
