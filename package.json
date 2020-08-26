@@ -1,6 +1,6 @@
 {
   "name": "react-native-game-auth",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Getting auth for serverside",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
