@@ -6,16 +6,16 @@ import {
 } from 'react-native';
 
 interface Player {
-  alias: String;
-  displayName: String;
-  playerID: String;
+  alias: string;
+  displayName: string;
+  playerID: string;
 }
 
 export interface IdentityVerificationSignature {
-  publicKeyUrl: String;
-  signature: String;
-  salt: String;
-  timestamp: Number;
+  publicKeyUrl: string;
+  signature: string;
+  salt: string;
+  timestamp: number;
 }
 
 type PlayGamesAuthType = {
@@ -44,7 +44,7 @@ if (PlayGamesAuth) {
   PlayGamesAuth.onAuthTokenChanged = (callback: any) => {
     return DeviceEventEmitter.addListener(
       PlayGamesAuth.AUTH_TOKEN_CHANGED_EVENT,
-      (token: String) => {
+      (token: string) => {
         callback(token);
       }
     );
@@ -64,11 +64,11 @@ if (NativeModules.GameAuth) {
 
 type GameCenterAuthType = {
   initAuth(showUIIfUnauthenticated: boolean): void;
-  isAuthenticated(): Promise<Boolean>;
+  isAuthenticated(): Promise<boolean>;
   getPlayer(): Promise<Player>;
   getServerAuth(): Promise<IdentityVerificationSignature>;
   onAuthenticate(
-    callback: (isAuthenticated: boolean) => void
+    callback: (isAuthenticated: boolean, error?: string) => void
   ): EmitterSubscription;
 };
 

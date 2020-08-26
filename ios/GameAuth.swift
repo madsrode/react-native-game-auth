@@ -11,22 +11,22 @@ class GameAuth: RCTEventEmitter {
     
     @objc
     func initAuth(_ showUIIfUnauthenticated: Bool) {
-        let ui = UIApplication.shared.keyWindow?.rootViewController;
-        
         let player = GKLocalPlayer.local
         if(player.authenticateHandler == nil) {
-            player.authenticateHandler = { vc, error in
+                player.authenticateHandler = { vc, error in
                 self.loginUI = vc;
                 if(vc != nil) {
                     if(showUIIfUnauthenticated) {
-                        ui?.present(vc!, animated: true, completion: nil);
+                        DispatchQueue.main.async {
+                            UIApplication.shared.keyWindow?.rootViewController?.present(self.loginUI!, animated: true, completion: nil);
+                        }
                     }
                     else {
-                        self.sendEvent(withName: self.C_OnAuthenticated, body: ["isAuthenticated":false, "error": error])
+                        self.sendEvent(withName: self.C_OnAuthenticated, body: ["isAuthenticated":false, "error": error?.localizedDescription as Any])
                     }
                 }
                 else {
-                    self.sendEvent(withName: self.C_OnAuthenticated, body: ["isAuthenticated":player.isAuthenticated, "error": error])
+                    self.sendEvent(withName: self.C_OnAuthenticated, body: ["isAuthenticated":player.isAuthenticated, "error": error?.localizedDescription as Any])
                 }
             }
         }
@@ -36,7 +36,9 @@ class GameAuth: RCTEventEmitter {
             }
             else {
                 if(showUIIfUnauthenticated && self.loginUI != nil) {
-                    ui?.present(self.loginUI!, animated: true, completion: nil);
+                    DispatchQueue.main.async {
+                        UIApplication.shared.keyWindow?.rootViewController?.present(self.loginUI!, animated: true, completion: nil);
+                    }
                 }
             }
         }
