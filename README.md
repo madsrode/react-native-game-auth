@@ -1,6 +1,6 @@
 # react-native-game-auth
 
-Getting auth for serverside
+Getting auth for serverside for both Google Play Games and Apple Game Center
 
 ## Installation
 
@@ -11,11 +11,31 @@ npm install react-native-game-auth
 ## Usage
 
 ```js
-import GameAuth from "react-native-game-auth";
+import { GameCenterAuth, PlayGamesAuth } from 'react-native-game-auth';
 
-// ...
+React.useEffect(() => {
+  if (PlayGamesAuth) {
+    PlayGamesAuth.onAuthStateChanged((isSignedIn: boolean): void => {
+      console.log('Play Games Auth State Changed', isSignedIn);
+    });
+    PlayGamesAuth.onAuthTokenChanged((s: string) => {
+      console.log('Play Games AuthToken', s);
+    });
+  }
 
-const result = await GameAuth.multiply(3, 7);
+  if (GameCenterAuth) {
+    const x = GameCenterAuth.onAuthenticate((i) => {
+      console.log('Game Center auth status:', i)
+    });
+    GameCenterAuth.initAuth();
+
+    return () => {
+      x.remove();
+    };
+  }
+
+  return () => {};
+}, []);
 ```
 
 ## Contributing
